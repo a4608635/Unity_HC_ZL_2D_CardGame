@@ -20,33 +20,31 @@ public class GetCard : MonoBehaviour
         loadingPanel.alpha = 1;                 // 顯示
         loadingPanel.blocksRaycasts = true;     // 啟動遮擋
 
-        // 引用 (網路要求 www = 網路要求.Post("網址", ""))
-        using (UnityWebRequest www = UnityWebRequest.Post("https://script.google.com/macros/s/AKfycbw5tzw4smBcz6qqilN7odl11FelAK52gfzenMWBCubCWgLozV0/exec", ""))
+        // 網路要求 www = 網路要求.Post("網址", "")
+        UnityWebRequest www = UnityWebRequest.Post("https://script.google.com/macros/s/AKfycbw5tzw4smBcz6qqilN7odl11FelAK52gfzenMWBCubCWgLozV0/exec", "");
+        // 等待 網路要求時間
+        // yield return www.SendWebRequest();
+
+        // 網路要求
+        www.SendWebRequest();
+
+        // 當 載入進度 < 1
+        while (www.downloadProgress < 1)
         {
-            // 等待 網路要求時間
-            // yield return www.SendWebRequest();
+            yield return null;
+            loading.fillAmount = www.downloadProgress;  // 更新載入吧條
+        }
 
-            // 網路要求
-            www.SendWebRequest();
-
-            // 當 載入進度 < 1
-            while (www.downloadProgress < 1)
-            {
-                yield return null;
-                loading.fillAmount = www.downloadProgress;  // 更新載入吧條
-            }
-
-            if (www.isHttpError || www.isNetworkError)
-            {
-                print("連線錯誤：" + www.error);
-            }
-            else
-            {
-                // 將 JSON 轉為陣列並儲存在 cards 內
-                cards = JsonHelper.FromJson<CardData>(www.downloadHandler.text);
-                // 呼叫建立卡牌方法
-                CreateCard();
-            }
+        if (www.isHttpError || www.isNetworkError)
+        {
+            print("連線錯誤：" + www.error);
+        }
+        else
+        {
+            // 將 JSON 轉為陣列並儲存在 cards 內
+            cards = JsonHelper.FromJson<CardData>(www.downloadHandler.text);
+            // 呼叫建立卡牌方法
+            CreateCard();
         }
 
         yield return new WaitForSeconds(0.5f);  // 等待

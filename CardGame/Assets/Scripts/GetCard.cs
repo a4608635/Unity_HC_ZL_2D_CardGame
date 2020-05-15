@@ -5,46 +5,46 @@ using System.Collections;
 
 public class GetCard : MonoBehaviour
 {
+    [Header("卡牌資料")]
     public CardData[] cards;
-
+    [Header("卡牌")]
     public GameObject cardObject;
+    [Header("卡牌內容")]
     public Transform cardPanel;
 
     private CanvasGroup loadingPanel;
     private Image loading;
 
+    public static GetCard instance;
+
+    /// <summary>
+    /// 載入卡牌資料
+    /// </summary>
     private IEnumerator GetCardData()
     {
         loadingPanel.alpha = 1;
         loadingPanel.blocksRaycasts = true;
 
         // 引用 (網路要求 www = 網路要求.Post("網址", ""))
-        using (UnityWebRequest www = UnityWebRequest.Post("https://script.google.com/macros/s/AKfycbw5tzw4smBcz6qqilN7odl11FelAK52gfzenMWBCubCWgLozV0/exec", ""))
+        UnityWebRequest www = UnityWebRequest.Post("https://script.google.com/macros/s/AKfycbw5tzw4smBcz6qqilN7odl11FelAK52gfzenMWBCubCWgLozV0/exec", "");
+
+        www.SendWebRequest();
+
+        while (!www.isDone)
         {
-            // 等待 網路要求時間
+            yield return null;
+            loading.fillAmount = www.downloadProgress;
+        }
 
-            //yield return www.SendWebRequest();
+        if (www.isHttpError || www.isNetworkError)
+        {
+            print("連線錯誤：" + www.error);
+        }
+        else
+        {
+            cards = JsonHelper.FromJson<CardData>(www.downloadHandler.text);
 
-            www.SendWebRequest();
-
-            while (!www.isDone)
-            {
-                yield return null;
-                loading.fillAmount = www.downloadProgress;
-            }
-
-            if (www.isHttpError || www.isNetworkError)
-            {
-                print("連線錯誤：" + www.error);
-            }
-            else
-            {
-                print(www.downloadHandler.text);
-
-                cards = JsonHelper.FromJson<CardData>(www.downloadHandler.text);
-
-                CreateCard();
-            }
+            CreateCard();
         }
 
         yield return new WaitForSeconds(0.5f);
@@ -52,21 +52,33 @@ public class GetCard : MonoBehaviour
         loadingPanel.blocksRaycasts = false;
     }
 
+    /// <summary>
+    /// 生成卡牌
+    /// </summary>
     private void CreateCard()
     {
         for (int i = 0; i < cards.Length; i++)
         {
             Transform temp = Instantiate(cardObject, cardPanel).transform;
-            temp.Find("消耗").GetComponent<Text>().text = cards[i].cost.ToString();
-            temp.Find("攻擊").GetComponent<Text>().text = cards[i].attack.ToString();
-            temp.Find("血量").GetComponent<Text>().text = cards[i].hp.ToString();
-            temp.Find("名稱").GetComponent<Text>().text = cards[i]._name;
-            temp.Find("描述").GetComponent<Text>().text = cards[i].description;
+
+            CardData card = cards[i];
+
+            temp.Find("消耗").GetComponent<Text>().text = card.cost.ToString();
+            temp.Find("攻擊").GetComponent<Text>().text = card.attack.ToString();
+            temp.Find("血量").GetComponent<Text>().text = card.hp.ToString();
+            temp.Find("名稱").GetComponent<Text>().text = card.name;
+            temp.Find("描述").GetComponent<Text>().text = card.description;
+
+            temp.Find("遮色片").Find("圖片").GetComponent<Image>().sprite = Resources.Load<Sprite>(card.file);
+
+            temp.gameObject.AddComponent<CardDeck>().index = card.index;
         }
     }
 
     private void Start()
     {
+        instance = this;
+
         loadingPanel = GameObject.Find("載入畫面").GetComponent<CanvasGroup>();
         loading = GameObject.Find("進度條").GetComponent<Image>();
         StartCoroutine(GetCardData());
@@ -77,7 +89,7 @@ public class GetCard : MonoBehaviour
 public class CardData
 {
     public int index;
-    public string _name;
+    public string name;
     public string description;
     public int cost;
     public float attack;

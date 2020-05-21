@@ -22,6 +22,6 @@ public class BookCard : MonoBehaviour
     /// </summary>
     public void ChooseCard()
     {
-        DeckManager.instancs.AddCard(index);
+        DeckManager.instance.AddCard(index);
     }
 }

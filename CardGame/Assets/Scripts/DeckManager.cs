@@ -12,7 +12,7 @@ public class DeckManager : MonoBehaviour
 
     [Header("牌組物件")]
     public GameObject deckObject;
-    [Header("牌組內榮")]
+    [Header("牌組內容")]
     public Transform deckContent;
     [Header("牌組數量")]
     public Text textDeckCount;
@@ -20,6 +20,10 @@ public class DeckManager : MonoBehaviour
     public Button btnStart;
     [Header("洗牌後牌組")]
     public Transform tranShuffle;
+    [Header("金幣")]
+    public Rigidbody coin;
+    [Header("遊戲畫面")]
+    public GameObject gameView;
 
     /// <summary>
     /// 牌組管理器實體物件
@@ -170,6 +174,18 @@ public class DeckManager : MonoBehaviour
     /// </summary>
     private void StartBattle()
     {
+        gameView.SetActive(true);   // 顯示遊戲畫面
+
         Shuffle();
+        ThrowCoin();
+    }
+
+    /// <summary>
+    /// 擲金幣
+    /// </summary>
+    private void ThrowCoin()
+    {
+        coin.AddForce(0, Random.Range(300, 500), 0);            // 推力
+        coin.AddTorque(Random.Range(200, 500), 0, 0);           // 旋轉
     }
 }

@@ -2204,6 +2204,7 @@ GameObject:
   - component: {fileID: 1379838649}
   - component: {fileID: 1379838650}
   - component: {fileID: 1379838651}
+  - component: {fileID: 1379838652}
   m_Layer: 0
   m_Name: "\u5361\u724C\u7BA1\u7406\u5668"
   m_TagString: Untagged
@@ -2260,6 +2261,18 @@ MonoBehaviour:
   textDeckCount: {fileID: 1457239121}
   btnStart: {fileID: 259648051}
   tranShuffle: {fileID: 512436606}
+--- !u!114 &1379838652
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1379838648}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6e46499adba4450459e17a730ddf44d9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   coin: {fileID: 1667979323613219}
   gameView: {fileID: 449032768}
 --- !u!1 &1457239119
@@ -2584,8 +2597,8 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1708902328}
   m_HandleRect: {fileID: 1708902327}
   m_Direction: 0
-  m_Value: 0
-  m_Size: 1
+  m_Value: 1
+  m_Size: 0.99999994
   m_NumberOfSteps: 0
   m_OnValueChanged:
     m_PersistentCalls:

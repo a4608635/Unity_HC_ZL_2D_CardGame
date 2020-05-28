@@ -21,6 +21,8 @@ public class DeckManager : MonoBehaviour
     [Header("洗牌後牌組")]
     public Transform tranShuffle;
 
+    public Rigidbody coin;
+
     /// <summary>
     /// 牌組管理器實體物件
     /// </summary>
@@ -171,5 +173,15 @@ public class DeckManager : MonoBehaviour
     private void StartBattle()
     {
         Shuffle();
+        ThrowCoin();
+    }
+
+    /// <summary>
+    /// 擲硬幣
+    /// </summary>
+    private void ThrowCoin()
+    {
+        coin.AddForce(0, Random.Range(300, 500), 0);
+        coin.AddTorque(90, 0, 0);
     }
 }

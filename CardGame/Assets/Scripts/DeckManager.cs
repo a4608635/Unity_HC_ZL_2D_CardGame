@@ -8,7 +8,16 @@ using System.Collections.Generic;
 public class DeckManager : MonoBehaviour
 {
     // 清單<要存放的類型> 清單名稱 = 新增 清單物件
+    [Header("牌組內卡牌資訊")]
+    /// <summary>
+    /// 牌組內卡牌資料
+    /// </summary>
     public List<CardData> deck = new List<CardData>();
+    [Header("牌組內卡牌遊戲物件")]
+    /// <summary>
+    /// 牌組內卡牌遊戲物件
+    /// </summary>
+    public List<GameObject> deckGameObject = new List<GameObject>();
 
     [Header("牌組物件")]
     public GameObject deckObject;
@@ -162,6 +171,8 @@ public class DeckManager : MonoBehaviour
             temp.Find("描述").GetComponent<Text>().text = card.description;
             // 尋找圖片子物件.圖片 = 來源.載入<圖片>(檔案名稱)
             temp.Find("遮色片").Find("圖片").GetComponent<Image>().sprite = Resources.Load<Sprite>(card.file);
+            // 將生出來的卡牌物件存放到清單內
+            deckGameObject.Add(temp.gameObject);
         }
     }
 

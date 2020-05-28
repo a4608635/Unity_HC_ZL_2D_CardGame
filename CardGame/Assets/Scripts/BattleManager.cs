@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class BattleManager : MonoBehaviour
@@ -24,6 +25,7 @@ public class BattleManager : MonoBehaviour
     /// 對戰用牌組：手牌
     /// </summary>
     public List<CardData> battleDeck = new List<CardData>();
+    public List<GameObject> battleDeckCard = new List<GameObject>();
 
     private void Start()
     {
@@ -60,34 +62,63 @@ public class BattleManager : MonoBehaviour
     {
         // 三元運算子
         // 先後攻 = 布林運算 ? 成立 : 不成立
-        print(coin.transform.eulerAngles.x);
+        firstAttack = coin.transform.eulerAngles.x >= 0.3f ? true : false;
 
-        firstAttack = coin.transform.eulerAngles.x == 0 ? false : true;
-
-        print("先後攻：" + firstAttack);
-
-        /** 判斷式寫法
-        if (coin.rotation.x < 0)
-        {
-            firstAttack = false;
-        }
-        else
-        {
-            firstAttack = true;
-        }
-        */
-
-        GetCard();
+        StartCoroutine(GetCard(3));
     }
 
     /// <summary>
     /// 抽牌組卡排到手上牌組
     /// </summary>
-    private void GetCard()
+    private IEnumerator GetCard(int count)
     {
-        // 抽牌組第一張 放到 手牌 第一張
-        battleDeck.Add(DeckManager.instance.deck[0]);
-        // 刪除 牌組第一張
-        DeckManager.instance.deck.RemoveAt(0);
+        for (int i = 0; i < count; i++)
+        {
+            // 抽牌組第一張 放到 手牌 第一張
+            battleDeck.Add(DeckManager.instance.deck[0]);
+            // 刪除 牌組第一張
+            DeckManager.instance.deck.RemoveAt(0);
+
+            battleDeckCard.Add(DeckManager.instance.deckCard[0]);
+
+            DeckManager.instance.deckCard.RemoveAt(0);
+
+            yield return StartCoroutine(MoveCard());
+        }
+    }
+
+    public Transform canvas;
+    public Transform handCard;
+
+    /// <summary>
+    /// 移動卡片：顯示出來再放到手排
+    /// </summary>
+    private IEnumerator MoveCard()
+    {
+        RectTransform card = battleDeckCard[battleDeckCard.Count - 1].GetComponent<RectTransform>();
+
+        card.anchorMin = Vector2.one * 0.5f;
+        card.anchorMax = Vector2.one * 0.5f;
+
+        card.SetParent(canvas);
+
+        while (card.anchoredPosition.x > 501)
+        {
+            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(500, 0), 0.5f * Time.deltaTime * 35);
+            yield return null;
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        card.localScale = Vector3.one * 0.5f;
+
+        while (card.anchoredPosition.y > -274)
+        {
+            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(0, -275), 0.5f * Time.deltaTime * 35);
+            yield return null;
+        }
+
+        card.SetParent(handCard);
+        card.gameObject.AddComponent<HandCard>();
     }
 }

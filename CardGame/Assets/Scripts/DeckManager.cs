@@ -9,6 +9,7 @@ public class DeckManager : MonoBehaviour
 {
     // 清單<要存放的類型> 清單名稱 = 新增 清單物件
     public List<CardData> deck = new List<CardData>();
+    public List<GameObject> deckCard = new List<GameObject>();
 
     [Header("牌組物件")]
     public GameObject deckObject;
@@ -152,6 +153,8 @@ public class DeckManager : MonoBehaviour
         {
             // 變形 = 生成(物件，父物件).變形
             Transform temp = Instantiate(GetCard.instance.cardObject, tranShuffle).transform;
+
+            deckCard.Add(temp.gameObject);
             // 卡片資料
             CardData card = deck[i];
             // 尋找子物件並更新文字

@@ -24,6 +24,10 @@ public class BattleManager : MonoBehaviour
     /// false 後
     /// </summary>
     private bool firstAttack;
+    /// <summary>
+    /// 水晶數量
+    /// </summary>
+    public int crystal = 1;
 
     [Header("手牌卡牌資訊")]
     /// <summary>

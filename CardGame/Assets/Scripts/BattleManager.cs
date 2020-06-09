@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections;
 using System.Collections.Generic;
 
@@ -17,17 +18,17 @@ public class BattleManager : MonoBehaviour
     public Transform canvas;
     [Header("手牌區域")]
     public Transform handArea;
-
-    /// <summary>
-    /// 先後攻
-    /// true 先
-    /// false 後
-    /// </summary>
-    private bool firstAttack;
+    [Header("水晶"), Tooltip("水晶圖片，用來顯示的 10 張")]
+    public GameObject[] crystalObject;
+    [Header("水晶數量介面")]
+    public Text textCrystal;
+    [Header("擲金幣畫面")]
+    public GameObject coinView;
+    
     /// <summary>
     /// 水晶數量
     /// </summary>
-    public int crystal = 1;
+    public int crystal;
 
     [Header("手牌卡牌資訊")]
     /// <summary>
@@ -37,9 +38,33 @@ public class BattleManager : MonoBehaviour
     [Header("手牌卡牌遊戲物件")]
     public List<GameObject> handGameObject = new List<GameObject>();
 
+    /// <summary>
+    /// 先後攻
+    /// true 先
+    /// false 後
+    /// </summary>
+    private bool firstAttack;
+
+    private bool myTurn;
+    private int crystalTotal;
+
     private void Start()
     {
         instance = this;
+    }
+
+    public void EndTurn()
+    {
+        myTurn = false;
+    }
+
+    public void StartTurn()
+    {
+        myTurn = true;
+        crystalTotal++;
+        crystal = crystalTotal;
+        Crystal();
+        StartCoroutine(GetCard(1));
     }
 
     /// <summary>
@@ -57,8 +82,8 @@ public class BattleManager : MonoBehaviour
     /// </summary>
     private void ThrowCoin()
     {
-        coin.AddForce(0, Random.Range(200, 450), 0);            // 推力
-        coin.AddTorque(Random.Range(200, 450), 0, 0);           // 旋轉
+        coin.AddForce(0, Random.Range(200, 400), 0);            // 推力
+        coin.AddTorque(Random.Range(200, 500), 0, 0);           // 旋轉
 
         Invoke("CheckCoin", 3);                                 // 延遲呼叫檢查方法
     }
@@ -77,7 +102,50 @@ public class BattleManager : MonoBehaviour
 
         firstAttack = coin.transform.GetChild(0).position.y > 0.25f ? true : false;
 
-        StartCoroutine(GetCard(3));
+        coinView.SetActive(false);      // 隱藏金幣畫面
+
+        // 如果 先攻 水晶 1 顆，卡牌 4 張
+        int card = 3;
+
+        if (firstAttack)
+        {
+            crystalTotal = 1;
+            crystal = 1;
+            card = 4;
+        }
+
+        Crystal();
+
+        StartCoroutine(GetCard(card));
+    }
+
+    /// <summary>
+    /// 處理水晶數量
+    /// </summary>
+    private void Crystal()
+    {
+        // 顯示目前有幾顆水晶
+        for (int i = 0; i < crystal; i++)
+        {
+            crystalObject[i].SetActive(true);
+        }
+
+        textCrystal.text = crystal + " / 10";
+    }
+
+    /// <summary>
+    /// 更新水晶介面與圖片
+    /// </summary>
+    public void UpdateCrystal()
+    {
+        for (int i = 0; i < crystalObject.Length; i++)
+        {
+            if (i < crystal) continue;  // 如果 迴圈編號 < 目前水晶數量 就繼續 (跳過此次)
+
+            crystalObject[i].SetActive(false);
+        }
+
+        textCrystal.text = crystal + " / 10";
     }
 
     /// <summary>
@@ -114,18 +182,18 @@ public class BattleManager : MonoBehaviour
 
         while (card.anchoredPosition.x > 501)   // 當 X > 501 執行移動
         {
-            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(500, 0), 0.5f * Time.deltaTime * 30);   // 卡片位置前往 500, 0
+            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(500, 0), 0.5f * Time.deltaTime * 50);   // 卡片位置前往 500, 0
 
             yield return null;                  // 等待一個影格
         }
 
-        yield return new WaitForSeconds(0.35f); // 停留 0.35 秒
+        yield return new WaitForSeconds(0.2f); // 停留 0.35 秒
 
         card.localScale = Vector3.one * 0.5f;   // 縮小
 
         while (card.anchoredPosition.y > -274)   // 當 Y > -275 執行移動
         {
-            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(0, -275), 0.5f * Time.deltaTime * 30);   // 卡片位置前往 500, 0
+            card.anchoredPosition = Vector2.Lerp(card.anchoredPosition, new Vector2(0, -275), 0.5f * Time.deltaTime * 50);   // 卡片位置前往 500, 0
 
             yield return null;                  // 等待一個影格
         }

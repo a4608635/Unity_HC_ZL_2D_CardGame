@@ -202,9 +202,25 @@ public class BattleManager : MonoBehaviour
 
         yield return new WaitForSeconds(0.2f); // 停留 0.35 秒
 
+        // 爆牌
         if (handCardCount == 10)
         {
-            print("爆掉手牌");
+            card.GetChild(1).GetComponent<Image>().material = Instantiate(card.GetChild(1).GetComponent<Image>().material);
+            card.GetChild(0).GetChild(0).GetComponent<Image>().material = Instantiate(card.GetChild(0).GetChild(0).GetComponent<Image>().material);
+
+            Material M = card.GetChild(1).GetComponent<Image>().material;                // 取得材質
+            Material M0 = card.GetChild(0).GetChild(0).GetComponent<Image>().material;   // 取得材質
+
+            M.SetFloat("Switch", 1);                // 設定布林值
+            float a = 0;                            // 透明度
+
+            while (M.GetFloat("AlphaClip")<4)       // 當 透明度 < 4
+            {
+                a += 0.1F;                          // 透明度 遞增
+                M.SetFloat("AlphaClip", a);         // 設定浮點數
+                M0.SetFloat("AlphaClip", a);         // 設定浮點數
+                yield return null;
+            }
         }
 
         else

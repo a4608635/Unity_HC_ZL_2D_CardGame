@@ -43,12 +43,12 @@ public class BattleManager : MonoBehaviour
     /// true 先
     /// false 後
     /// </summary>
-    private bool firstAttack;
+    protected bool firstAttack;
 
     private bool myTurn;
-    private int crystalTotal;
+    protected int crystalTotal;
 
-    private void Start()
+    protected virtual void Start()
     {
         instance = this;
     }
@@ -100,7 +100,7 @@ public class BattleManager : MonoBehaviour
     /// rotation.x 為 -1 - 背面
     /// rotation.x 為 0  - 正面
     /// </summary>
-    private void CheckCoin()
+    protected virtual void CheckCoin()
     {
         // 三元運算子
         // 先後攻 = 布林運算 ? 成立 : 不成立
@@ -129,7 +129,7 @@ public class BattleManager : MonoBehaviour
     /// <summary>
     /// 處理水晶數量
     /// </summary>
-    private void Crystal()
+    protected void Crystal()
     {
         // 顯示目前有幾顆水晶
         for (int i = 0; i < crystal; i++)
@@ -179,7 +179,7 @@ public class BattleManager : MonoBehaviour
     /// <summary>
     /// 手牌數量
     /// </summary>
-    private int handCardCount;
+    public int handCardCount;
 
     /// <summary>
     /// 顯示卡牌再移動到手上
@@ -212,15 +212,25 @@ public class BattleManager : MonoBehaviour
             Material M0 = card.GetChild(0).GetChild(0).GetComponent<Image>().material;   // 取得材質
 
             M.SetFloat("Switch", 1);                // 設定布林值
+            M0.SetFloat("Switch", 1);               // 設定布林值
             float a = 0;                            // 透明度
+
+            // 隱藏所有文字子物件
+            Text[] texts = card.GetComponentsInChildren<Text>();
+
+            for (int i = 0; i < texts.Length; i++) texts[i].enabled = false;
 
             while (M.GetFloat("AlphaClip")<4)       // 當 透明度 < 4
             {
                 a += 0.1F;                          // 透明度 遞增
                 M.SetFloat("AlphaClip", a);         // 設定浮點數
-                M0.SetFloat("AlphaClip", a);         // 設定浮點數
+                M0.SetFloat("AlphaClip", a);        // 設定浮點數
                 yield return null;
             }
+
+            Destroy(card.gameObject);
+            battleDeck.RemoveAt(battleDeck.Count - 1);
+            handGameObject.RemoveAt(handGameObject.Count - 1);
         }
 
         else
